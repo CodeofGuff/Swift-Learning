@@ -1,0 +1,105 @@
+// 100 DAYS OF SwiftUI \\
+
+REVIEW
+Swift lets us create constants using let, and variables using var.
+If you don’t intend to change a value, make sure you use let so that Swift can help you avoid mistakes.
+Swift’s strings contain text, from short strings up to whole novels. They work great with emoji and any world language, and have helpful functionality such as count and uppercased().
+You create strings by using double quotes at the start and end, but if you want your string to go over several lines you need to use three double quotes at the start and end.
+Swift calls its whole numbers integers, and they can be positive or negative. They also have helpful functionality, such as isMultiple(of:).
+In Swift decimal numbers are called Double, short for double-length floating-point number. That means they can hold very large numbers if needed, but they also aren’t 100% accurate – you shouldn’t use them when 100% precision is required, such as when dealing with money.
+There are lots of built-in arithmetic operators, such as +, -, *, and /, along with the special compound assignment operators such as += that modify variables directly.
+You can represent a simple true or false state using a Boolean, which can be flipped using the ! operator or by calling toggle().
+String interpolation lets us place constants and variables into our strings in a streamlined, efficient way.
+
+
+
+REVIEW
+Arrays let us store lots of values in one place, then read them out using integer indices. 
+Arrays must always be specialized so they contain one specific type, and they have helpful functionality such as count, append(), and contains().
+Dictionaries also let us store lots of values in one place, but let us read them out using keys we specify. 
+They must be specialized to have one specific type for key and another for the value, and have similar functionality to arrays, such as contains() and count.
+Sets are a third way of storing lots of values in one place, but we don’t get to choose the order in which they store those items. 
+Sets are really efficient at finding whether they contain a specific item.
+Enums let us create our own simple types in Swift so that we can specify a range of acceptable values such as a list of actions 
+ the user can perform, the types of files we are able to write, or the types of notification to send to the user.
+Swift must always know the type of data inside a constant or variable, and mostly uses type inference to figure that out based on the data we assign. 
+However, it’s also possible to use type annotation to force a particular type.
+
+
+
+REVIEW: Conditions and loops
+We use if statements to check a condition is true. You can pass in any condition you want, but ultimately it must boil down to a Boolean.
+If you want, you can add an else block, and/or multiple else if blocks to check other conditions. Swift executes these in order.
+You can combine conditions using ||, which means that the whole condition is true if either subcondition is true, or &&, which means the whole condition is true if both subconditions are true.
+If you’re repeating the same kinds of check a lot, you can use a switch statement instead. These must always be exhaustive, which might mean adding a default case.
+If one of your switch cases uses fallthrough, it means Swift will execute the following case afterwards. This is not used commonly.
+The ternary conditional operator lets us check WTF: What, True, False. Although it’s a little hard to read at first, you’ll see this used a lot in SwiftUI.
+for loops let us loop over arrays, sets, dictionaries, and ranges. You can assign items to a loop variable and use it inside the loop, or you can use underscore, _, to ignore the loop variable.
+while loops let us craft custom loops that will continue running until a condition becomes false.
+We can skip some or all loop items using continue or break respectively.
+
+
+
+REVIEW. 
+Functions let us reuse code easily by carving off chunks of code and giving it a name.
+All functions start with the word func, followed by the function’s name. The function’s body is contained inside opening and closing braces.
+We can add parameters to make our functions more flexible – list them out one by one separated by commas: the name of the parameter, then a colon, then the type of the parameter.
+You can control how those parameter names are used externally, either by using a custom external parameter name or by using an underscore to disable the external name for that parameter.
+If you think there are certain parameter values you’ll use repeatedly, you can make them have a default value so your function takes less code to write and does the smart thing by default.
+Functions can return a value if you want, but if you want to return multiple pieces of data from a function you should use a tuple. These hold several named elements, but it’s limited in a way a dictionary is not – you list each element specifically, along with its type.
+Functions can throw errors: you create an enum defining the errors you want to happen, throw those errors inside the function as needed, then use do, try, and catch to handle them at the call site.
+
+
+
+REVIEW. 
+You can copy functions in Swift, and they work the same as the original except they lose their external parameter names.
+All functions have types, just like other data types. This includes the parameters they receive along with their return type, which might be Void – also known as “nothing”.
+You can create closures directly by assigning to a constant or variable.
+Closures that accept parameters or return a value must declare this inside their braces, followed by the keyword in.
+Functions are able to accept other functions as parameters. They must declare up front exactly what data those functions must use, and Swift will ensure the rules are followed.
+In this situation, instead of passing a dedicated function you can also pass a closure – you can make one directly. Swift allows both approaches to work.
+When passing a closure as a function parameter, you don’t need to explicitly write out the types inside your closure if Swift can figure it out automatically. The same is true for the return value – if Swift can figure it out, you don’t need to specify it.
+If one or more of a function’s final parameters are functions, you can use trailing closure syntax.
+You can also use shorthand parameter names such as $0 and $1, but I would recommend doing that only under some conditions.
+You can make your own functions that accept functions as parameters, although in practice it’s much more important to know how to use them than how to create them.
+
+
+
+REVIEW. 
+Structs are used almost everywhere in Swift: String, Int, Double, Array and even Bool are all implemented as structs, and now you can recognize that a function such as isMultiple(of:) is really a method belonging to Int.
+You can create your own structs by writing struct, giving it a name, then placing the struct’s code inside braces.
+Structs can have variable and constants (known as properties) and functions (known as methods)
+If a method tries to modify properties of its struct, you must mark it as mutating.
+You can store properties in memory, or create computed properties that calculate a value every time they are accessed.
+We can attach didSet and willSet property observers to properties inside a struct, which is helpful when we need to be sure that some code is always executed when the property changes.
+Initializers are a bit like specialized functions, and Swift generates one for all structs using their property names.
+You can create your own custom initializers if you want, but you must always make sure all properties in your struct have a value by the time the initializer finishes, and before you call any other methods.
+We can use access to mark any properties and methods as being available or unavailable externally, as needed.
+It’s possible to attach a property or methods directly to a struct, so you can use them without creating an instance of the struct.
+
+
+REVIEW.
+Classes have lots of things in common with structs, including the ability to have properties and methods, but there are five key differences between classes and structs.
+First, classes can inherit from other classes, which means they get access to the properties and methods of their parent class. You can optionally override methods in child classes if you want, or mark a class as being final to stop others subclassing it.
+Second, Swift doesn’t generate a memberwise initializer for classes, so you need to do it yourself. If a subclass has its own initializer, it must always call the parent class’s initializer at some point.
+Third, if you create a class instance then take copies of it, all those copies point back to the same instance. This means changing some data in one of the copies changes them all.
+Fourth, classes can have deinitializers that run when the last copy of one instance is destroyed.
+Finally, variable properties inside class instances can be changed regardless of whether the instance itself was created as variable.
+
+
+REVIEW.
+Protocols are like contracts for code: we specify the functions and methods that we required, and conforming types must implement them.
+Opaque return types let us hide some information in our code. That might mean we want to retain flexibility to change in the future, but also means we don’t need to write out gigantic return types.
+Extensions let us add functionality to our own custom types, or to Swift’s built-in types. This might mean adding a method, but we can also add computed properties.
+Protocol extensions let us add functionality to many types all at once – we can add properties and methods to a protocol, and all conforming types get access to them.
+
+
+REVIEW.
+Optionals let us represent the absence of data, which means we’re able to say “this integer has no value” – that’s different from a fixed number such as 0.
+As a result, everything that isn’t optional definitely has a value inside, even if that’s just an empty string.
+Unwrapping an optional is the process of looking inside a box to see what it contains: if there’s a value inside it’s sent back for use, otherwise there will be nil inside.
+We can use if let to run some code if the optional has a value, or guard let to run some code if the optional doesn’t have a value – but with guard we must always exit the function afterwards.
+The nil coalescing operator, ??, unwraps and returns an optional’s value, or uses a default value instead.
+Optional chaining lets us read an optional inside another optional with a convenient syntax.
+If a function might throw errors, you can convert it into an optional using try? – you’ll either get back the function’s return value, or nil if an error is thrown.
+
