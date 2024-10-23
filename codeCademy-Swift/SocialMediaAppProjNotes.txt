@@ -1,0 +1,329 @@
+Welcome to Build a Social Media iOS App with Firebase and SwiftUI! 
+ In this Skill Path, you’ll learn how to use Swift to make network calls and get 
+ information from external APIs. SwiftUI has some great tools for getting data from online, 
+ which you’ll use to build an application that pulls users from the Random User Generator API: https:randomuser.me
+
+Next, you’ll learn how to build out Socialcademy, a robust, fully-featured social media application using Firebase. 
+ In Socialcademy, users will be able to create accounts upload posts, and view and comment on posts from other users. 
+ You’ll build many other features along the way as well!
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Main Project in Xcode with Notes within the Code
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Chap 1: Concurrency and Grand Central Dispatch
+ What Concurrency is
+ What Threading is
+ What GCD is
+ What Serial and Concurrent Queues are
+ Why NOT to Block the Main Thread
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Concurrency is an apps ability to process more than one task at a time
+ If the app process tasks concurrently, the tasks must be independent of each other
+ Meaning the completetion of one task, is not dependent on another. 
+ ie. mowing the lawn when its morning -> washing dishes -> Laundry -> mowing the lawn in the evening, neither tasks required the other being completed
+ you can do whatever, as long as you stop doing one thing first
+
+Sequential Programming is when tasks ARE dependent on another being completed
+ ie, Clean Dishes -> Dry Dishes, You must clean the dishes before drying them
+ DO this, THEN this, THEN that, etc. 
+
+Parallelism is the execution of multiple tasks at the same time. Here is how concurrency differs from parallelism:
+  - Parallelism needs hardware with multiprocessing units whereas concurrency does not
+  - Concurrency requires two tasks to exist whereas parallelism only requires one
+  - Parallelism assigns each task for a core to execute whereas concurrency executes all tasks by switching tasks at the same time
+
+ Context Switching allows for concurrency 
+ if a task is stopped or paused and another one is started, 
+ the state of execution must be stored so the task knows where to begin when it continues.
+
+ Parallelism does not require Context Switching, because the app is capable of executing the next task on a different cpu core
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Threading
+ Every app begins on the Main Thread or Main Queue
+ The checkout line is a Queue, cashiers are Threadas, customers are Tasks.
+ A Queue contains Threads, that will exec Tasks as they appear
+ The Main Queue starts and runs the whole app, but can Spawn other Threads to complete Tasks for the App.. This is Multi-threading
+
+Multi-Threading
+Splitting of a program into two or more tasks that can run independently of one another.
+ ie. the Socialcademy app  needs to:
+ - Query a database for the current user’s profile image\
+ - Query a database for posts and display them\
+ - Query a database for the user’s favorite posts\
+ - Update the database after the user favorites a post
+ Instead of using the main thread, which executes sequentially, you can create threads to execute the above tasks. 
+ Takss 1 - 3 can be completed at the same time, but taks 4 must wait for all three of them to finish before starting
+
+------------------------------------------------------------------------------------------------------------------------------
+GCD is an older framework, but still need to know a basic understanding. Notes will be limited
+GCD seeks to provide the developer with ease for threading operations by using queues to manage tasks. 
+A queue is a structure that handles tasks in the first-in, first-out operational order. 
+Instead of having to manually manage individual threads, Swift developers can execute tasks through the queues.
+Let’s look at the different types of GCD queues.
+
+  GCD queues are either serial or concurrent. By default, GCD queues are serial.
+   - Serial Queues: Execute tasks sequentially.
+   - Concurrent Queues: Execute tasks concurrently.
+
+  GCD tasks can be executed using 1 of the 3 following queues:
+   - Main Queue: Runs on the main thread and is a serial queue\
+   - Global Queue(s): Concurrent queues shared by the entire system. There are different priorities: high, default, low, and background depending on how important the task is.\
+   - Custom Queue(s): Custom queues that you can create that can be serial or concurrent.~
+------------------------------------------------------------------------------------------------------------------------------
+
+Main Queue 
+ It is important to not put tasks in the Main Queue that take a long time, like a network call that could take 10 seconds, 
+ and during that time the user can't do anything. 
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Async Await 
+ The new Swift structured concurrency 
+ How to use the async and await keywords for calling asynchronous operations.
+The await keyword works like the try keyword. It will execute the asynchronous function and wait for the result. 
+The async keyword declares a function as a coroutine. 
+Coroutines are functions that may return normally with a value or may suspend themselves internally and return a continuation. 
+Asynchronous functions can return a value directly instead of calling a completion handler.
+
+We can define an asynchronous function and execute that function using the await keyword.
+ But, what if we want to execute multiple asynchronous functions in synchronous order, 
+ i.e. one after another?
+We can also create asynv variables that will store the returned value from the function call. 
+Making a varibale with the async keyword will call the asynchronous func instantly, but it will not block the thread
+so your code continues to exec
+
+func loadUserData() {
+    Task {
+        async let profileImageTask = userProfileImage()
+        async let profileNameTask = userProfileName()
+        async let profileAgeTask = userProfileAge()
+        let userData: (Image, String, Int) = await (profileImage, profileName, profileAge)
+    }
+}
+The await keyword is used with the array instead of with each variable assignment. 
+As soon as an async variable is declared, the function kicks off and starts making network calls. 
+In order to refer to an async variable, the await keyword must be used. 
+This means that multiple calls can be started right after each other and will run in parallel. 
+The code will only stop and wait once the await keyword is used.
+
+
+
+Actors and @MainActor
+Actors eliminate shared mutable state. 
+Actors can be thought of as a DispatchQueue, the data that queue protects and messages that can be run on the queue. 
+
+
+How to bridge Asynchronous and Synchronous functions:
+
+func downloadImage(completionHandler: @espcaing (_ image: UIImage?, _ error: Error?) -> Void) { }
+func downloadData() async throws -> UIImage {
+    return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<UIImage, Error>) in
+        downloadImage() { image, error in
+            if let image = image {
+                continuation.resume(returning: image)
+            } else {
+                continuation.resume(throwing: error!)
+            }
+        }
+    })
+}
+Continuations are objects that provide us with methods to resume the asynchronous task with an object or throw an error. 
+withCheckedThrowingContinuation(continuation:) is a function that takes in a closure where you can specify when 
+a completion handler has been executed and return the data.
+Now you can use the new downloadImageSwift55Style across you codebase to avoid using completion handlers.
+
+The @MainActor attribute is a globally unique actor who performs tasks on the main thread so you don’t perform UI updates on a background thread
+
+RandomUserGenerator App: 
+You built a working application to fetch JSON of randomly generated users. 
+You applied the @MainActor attribute to update your model on the main thread after obtaining random users asynchronously using async and await. 
+You retrieved JSON from the Random User Generator API using a URLSession.
+
+
+
+
+Converting an API JSON Response into a Data Model
+
+Codable: 
+ - Codable is a protocol that enables a Swift structure to be encoded into JSON or decoded from JSON
+   - Combo of Encodable and Deconable protocols
+     - Encodable allows the Swift struct to encode into JSON when it comes to sending an API
+     - Decoable allows a JSON response to be decoded into a Swift struct
+
+struct Name: Codable {
+  var first: String
+  var last: String
+}
+
+Requierments for Codable: 
+ - Protocols must be types that also conform to Codable (most types already do)
+
+
+ Multiple Layers of nested models in JSON:
+ {
+  "name": {
+    "first": "Mickey",
+    "last": "Mouse",
+  },
+  "age": 10,
+  "location": {
+    "city": "Los Angeles",
+    "state": "California",
+    "country": "United States"
+  }
+}
+
+Convert it into something Modular and simple to use that conforms to Codable: 
+
+struct Name: Codable {
+  var first: String
+  var last: String
+}
+
+struct Location: Codable {
+  var city: String,
+  var state: String,
+  var country: String
+}
+
+struct Student: Codable {
+  var name: Name, // Struct 1
+  var age: Int,
+  var location: Location // Struct 2
+}
+
+
+Using Coding Keys to decode properties:
+ - Transforming properties with different naming conventions to our own
+ - camelCase i the most commom, along with snake_case for most APIs, camelCase for Swift APIs
+ - Coding Keys allow us to have a different name for a property then the JSON. 
+
+ camelCase + snake_case: 
+ {
+  "age": 10,
+  "likes": "cartoons",
+  "location": {
+    "city_of_student": "Los Angeles",
+    "state": "California",
+    "country": "USA"
+  },
+  "name": {
+    "first_name": "Mickey",
+    "last_name": "Mouse"
+  }
+}
+
+Using Coding Keys + enums:
+struct Name: Codable {
+    var first: String
+    var last: String
+
+    enum CodingKeys: String, CodingKey { // 1
+    case first = "first_name"
+    case last = "last_name"
+    }
+}
+
+struct Location: Codable {
+    var city: String
+    var state: String
+    var country: String
+
+    enum CodingKeys: String, CodingKey {
+        case city = "city_of_student"
+        case state, country
+    }
+
+}
+
+struct Student: Codable {
+    var location: Location // 2
+    var age: Int
+    var faveTopic: String
+    var name: Name
+
+    enum CodingKeys: String, CodingKey {
+        case faveTopic: "likes" // 2
+        case age, location, name
+    }
+}
+
+Coding Keys can be declared in the form of an enumeration as shown above 
+which conforms to the CodingKey protocol and has a raw value of type String.
+We mapped snake_case to camelCase properties using enums, making it simpler and specific
+
+
+
+Converting JSON responses manually
+ - Sometimes the auto conformance of Codable will not meet our needs
+  - The data type in the API may be different then our Swift data model
+
+{
+  "movie_name": "Titanic",
+  "release_month": "12",
+  "release_day": "19",
+  "release_year": "1997"
+}
+the dates are not the Date type and divided into sub-parts
+We want a struct that has a relaseDate prop of the Date type, instead of 4, seperate strings
+
+struct Movie: Decodable { // 1
+    var name: String
+    var releaseDate: Date
+    
+    enum CodingKeys: String, CodingKey {
+        case movie = "movie_name"
+        case releaseMonth = "release_month"
+        case releaseDay = "release_day"
+        case releaseYear = "release_year"
+    }
+    init(from decoder: Decoder) throw {
+        //2
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        name = try values.decode(String.self, forKey: .movie)
+        let releaseMonth = try values.decode(String.self, forKey: .releaseMonth)
+        let releaseDay = try values.decode(String.self, forKey: .releaseDay)
+        let releaseYear = try values.decode(String.self, forKey: .releaseYear)
+
+        // 3
+        let dateString = "\(releaseMonth)/\(releaseDay)/\(releaseYear)"
+        let dateFormatter - DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yy"
+        
+        releaseDate = dateFormatter.date(from: dateString) ?? Date()
+    }
+}
+
+We’re manually decoding JSON for the Movie structure, so it only conforms to Decodable. 
+Instead of relying on automatic decoding, we manually decode keys to build a composite object, 
+converting values into a Date object. The name property is directly assigned from the JSON, while 
+releaseDate is constructed by combining releaseMonth, releaseDay, and releaseYear. 
+This custom initializer allows us to convert different keys into the desired Date type in our data model.
+
+
+Conclusion
+Codable brings us a great amount of functionality to allow for a complete end-to-end solution for decoding and encoding data. 
+With the help of automatic conformance, both Decodable and Encodable offer straight out-of-the-box solutions to make our Swift structures full-fledged data models. 
+Coding Keys give us the ability to have modified versions of our properties so that we’re not always relying on the naming conventions provided by the API response. 
+This helps us build robust data models that can work with any type of API response rather than having to modify the API response itself. 
+We can even reimplement initializers to fully customize the properties of a data model.
+
+
+
+Unit Testing
+assesses a unit of code — in our case, a function. 
+A function that tests something in our codebase is called a unit test. 
+This unit test is responsible for testing for edge cases, such as:
+
+Calling a function by passing in an empty array as an argument.
+Making sure, overall, that the code works as expected.
+In the long run, test cases help us limit the number of bugs in an application.
+
